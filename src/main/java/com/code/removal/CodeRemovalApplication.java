@@ -1,4 +1,4 @@
-package com.code.removal.demo;
+package com.code.removal;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,36 +17,44 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.code.removal.sc.service.ISourceCodeService;
 import com.thoughtworks.qdox.JavaDocBuilder;
 import com.thoughtworks.qdox.model.JavaSource;
 
 @SpringBootApplication
 public class CodeRemovalApplication {
+	
+	@Autowired
+	ISourceCodeService codeService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(CodeRemovalApplication.class, args);
 
-		final String rootDirectory = "C:\\Users\\munekumar\\Java\\workspace\\completable-future\\";
-		final String sourcePath = rootDirectory + "src\\main\\java";
-		final String classPath = rootDirectory + "target\\classes\\";
+//		final String rootDirectory = "C:\\Users\\munekumar\\Java\\workspace\\completable-future\\";
+//		final String sourcePath = rootDirectory + "src\\main\\java";
+//		final String classPath = rootDirectory + "target\\classes\\";
+		
+		
+		
 
-		Set<String> packages = new HashSet<>();
-		Map<String, Set<String>> sourceMap = new HashMap<>();
+//		Set<String> packages = new HashSet<>();
+//		Map<String, Set<String>> sourceMap = new HashMap<>();
 		
 		//get all the packages for the specified ldirectory
-		getPackages(sourcePath, packages);
+//		getPackages(sourcePath, packages);
 		
 		//iterate each package and get the all classes and interfaces for each
-		packages.stream().forEach(packageName-> getClasses(classPath, packageName, sourceMap));
-		
-		Set<Entry<String, Set<String>>> entrySet = sourceMap.entrySet();
-		
-		for (Entry<String, Set<String>> entry : entrySet) {
-			System.out.println("Package: "+entry.getKey()+" Classes: "+entry.getValue());
-		}
+//		packages.stream().forEach(packageName-> getClasses(classPath, packageName, sourceMap));
+//		
+//		Set<Entry<String, Set<String>>> entrySet = sourceMap.entrySet();
+//		
+//		for (Entry<String, Set<String>> entry : entrySet) {
+//			System.out.println("Package: "+entry.getKey()+" Classes: "+entry.getValue());
+//		}
 		
 	}
 
