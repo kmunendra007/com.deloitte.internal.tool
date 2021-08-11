@@ -1,5 +1,6 @@
 package com.code.removal.sc.util;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -136,11 +137,10 @@ public abstract class SourceCodeUtil {
 
 		try {
 			// make a connection to the file
-			String filePath = (sourcePath + className).replace('.', '\\') + ".java";
+			String filePath = (sourcePath + className).replace('.', '\\')+ ".java";
 
 			Path files = Paths.get(filePath);
-
-			int count = (int) Files.lines(files).count();
+			int count = (int) Files.lines(files).map(s->s.trim()).filter(s -> !s.isEmpty()&&!s.startsWith("//")&&!s.endsWith("*/")&&!s.startsWith("//")).count();
 
 			String classNames = className.substring(className.lastIndexOf('.') + 1) + ".java";
 
