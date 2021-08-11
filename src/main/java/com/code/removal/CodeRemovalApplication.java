@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.code.removal.demo.model.ClassLineCount;
+import com.code.removal.model.ClassLineCount;
 import com.code.removal.sc.service.ISourceCodeService;
 import com.code.removal.sc.util.SourceCodeUtil;
 import com.thoughtworks.qdox.JavaDocBuilder;

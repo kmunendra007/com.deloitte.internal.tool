@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.code.removal.demo.model.SourceCode;
+import com.code.removal.model.SourceCode;
 import com.code.removal.sc.service.ISourceCodeService;
 
 @RestController

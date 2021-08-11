@@ -1,6 +1,5 @@
 package com.code.removal.sc.util;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -20,8 +19,8 @@ import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.code.removal.demo.model.ClassLineCount;
-import com.code.removal.demo.model.SourceCode;
+import com.code.removal.model.ClassLineCount;
+import com.code.removal.model.SourceCode;
 import com.thoughtworks.qdox.JavaDocBuilder;
 import com.thoughtworks.qdox.model.JavaSource;
 
