@@ -5,8 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -21,33 +23,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.code.removal.demo.model.ClassLineCount;
 import com.code.removal.sc.service.ISourceCodeService;
+import com.code.removal.sc.util.SourceCodeUtil;
 import com.thoughtworks.qdox.JavaDocBuilder;
 import com.thoughtworks.qdox.model.JavaSource;
 
 @SpringBootApplication
 public class CodeRemovalApplication {
-	
+
 	@Autowired
 	ISourceCodeService codeService;
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(CodeRemovalApplication.class, args);
 
 //		final String rootDirectory = "C:\\Users\\munekumar\\Java\\workspace\\completable-future\\";
 //		final String sourcePath = rootDirectory + "src\\main\\java";
 //		final String classPath = rootDirectory + "target\\classes\\";
-		
-		
-		
 
 //		Set<String> packages = new HashSet<>();
 //		Map<String, Set<String>> sourceMap = new HashMap<>();
-		
-		//get all the packages for the specified ldirectory
+
+		// get all the packages for the specified ldirectory
 //		getPackages(sourcePath, packages);
-		
-		//iterate each package and get the all classes and interfaces for each
+
+		// iterate each package and get the all classes and interfaces for each
 //		packages.stream().forEach(packageName-> getClasses(classPath, packageName, sourceMap));
 //		
 //		Set<Entry<String, Set<String>>> entrySet = sourceMap.entrySet();
@@ -55,10 +57,51 @@ public class CodeRemovalApplication {
 //		for (Entry<String, Set<String>> entry : entrySet) {
 //			System.out.println("Package: "+entry.getKey()+" Classes: "+entry.getValue());
 //		}
-		
+
+		final String rootDirectory = "C:\\Users\\JKALYANI\\Desktop\\practice\\spring-boot-crud-operation\\";
+		final String sourcePath = rootDirectory + "src\\main\\java\\";
+		final String classPath = rootDirectory + "target\\classes\\";
+
+		Set<String> packages = new HashSet<>();
+
+		Map<String, Set<String>> sourceMap = new HashMap<>();
+
+		Map<String, List<ClassLineCount>> classCount = new HashMap<>();
+
+		// get all the packages for the specified directory
+		getPackages(sourcePath, packages);
+
+		// iterate each package and get the all classes and interfaces for each
+		getClasses(classPath, packages, sourceMap);
+
+		Set<Entry<String, Set<String>>> entrySet = sourceMap.entrySet();
+
+		String packageName = null;
+		for (Entry<String, Set<String>> entry : entrySet) {
+
+			packageName = entry.getKey();
+
+			List<ClassLineCount> classLineCounts = new ArrayList<>();
+
+			for (String className : entry.getValue()) {
+
+				// getting the class names and number of lines for each class
+				SourceCodeUtil.getNumberOfLinesOfCode(sourcePath, className, classLineCounts);
+
+			}
+
+			classCount.put(packageName, classLineCounts);
+
+			// getting total number of lines for specific package
+			int sumOfPackage = classLineCounts.stream().mapToInt(i -> i.getLoc()).sum();
+			System.out.println("sumOfPackage:" + sumOfPackage);
+
+		}
+
 	}
 
-	private static void getPackages(final String sourcePath, Set<String> packages) {
+	public static void getPackages(final String sourcePath, Set<String> packages) {
+
 		File directory = new File(sourcePath);
 		// get all the files from a directory
 		File[] files = directory.listFiles();
@@ -74,7 +117,7 @@ public class CodeRemovalApplication {
 		}
 	}
 
-	private static void getClasses(final String classPath, final String packageName,
+	private static void getClasses(final String classPath, final Set<String> packages,
 			Map<String, Set<String>> sourceMap) {
 		try {
 
@@ -86,17 +129,17 @@ public class CodeRemovalApplication {
 
 			// load this folder into Class loader
 			ClassLoader cl = new URLClassLoader(urls);
+			for (String packageName : packages) {
+				Reflections reflections = new Reflections(
+						new ConfigurationBuilder().setScanners(new SubTypesScanner(false), new ResourcesScanner())
+								.setUrls(ClasspathHelper.forClassLoader(cl))
+								.filterInputsBy(new FilterBuilder().includePackage(packageName)));
 
-			Reflections reflections = new Reflections(
-					new ConfigurationBuilder().setScanners(new SubTypesScanner(false), new ResourcesScanner())
-							.setUrls(ClasspathHelper.forClassLoader(cl))
-							.filterInputsBy(new FilterBuilder().includePackage(packageName)));
+				// get all the classes and interfaces
+				Set<String> allTypes = reflections.getAllTypes();
 
-			// get all the classes and interfaces
-			Set<String> allTypes = reflections.getAllTypes();
-
-			sourceMap.put(packageName, allTypes);
-
+				sourceMap.put(packageName, allTypes);
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
