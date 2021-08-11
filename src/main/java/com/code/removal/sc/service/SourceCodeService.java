@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import com.code.removal.demo.model.SourceCode;
+import com.code.removal.model.SourceCode;
 import com.code.removal.sc.util.SourceCodeUtil;
 
 @Service
