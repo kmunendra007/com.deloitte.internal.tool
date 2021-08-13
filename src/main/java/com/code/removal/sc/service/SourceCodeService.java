@@ -24,8 +24,9 @@ public class SourceCodeService extends SourceCodeUtil implements ISourceCodeServ
 		Map<String, Boolean> importsMap = searchStringFromFile(imports);
 
 		// remove imports
-		// TODO: write a code to remove line from a file
-
+		for (String importString : importsMap.keySet()) {
+            removeLine(importString);
+        }
 		return false;
 	}
 

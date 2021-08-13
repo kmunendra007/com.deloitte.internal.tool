@@ -1,8 +1,10 @@
 package com.code.removal.sc.util;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,8 +17,10 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.code.removal.model.ClassLineCount;
@@ -151,4 +155,17 @@ public abstract class SourceCodeUtil {
 
 		}
 	}
+	
+	public boolean removeLine(String importString) {
+        File file = new File(filePath);
+        List<String> lines;
+        try {
+            lines = FileUtils.readLines(file, StandardCharsets.UTF_8);
+            List<String> updatedLines = lines.stream().filter(s -> !s.contains(importString)).collect(Collectors.toList());
+            FileUtils.writeLines(file, updatedLines, false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
 }
