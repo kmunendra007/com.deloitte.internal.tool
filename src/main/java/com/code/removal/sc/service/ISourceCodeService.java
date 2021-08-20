@@ -7,8 +7,11 @@ import java.util.Set;
 import com.code.removal.model.SourceCode;
 
 public interface ISourceCodeService {
-	boolean removeImports(final Map<String, Set<String>> sourceMap);
+	
+	boolean removeImports(final Map<String, Set<String>> sourceMap, final String sessionId);
 
-	List<SourceCode> checkNumberOfLines(final Map<String, Set<String>> sourceMap);
-
+	List<SourceCode> checkNumberOfLines(final Map<String, Set<String>> sourceMap, final String sessionId);
+	
+	boolean formatCode(final Map<String, Set<String>> sourceMap, final String sessionId);
+	
 }
