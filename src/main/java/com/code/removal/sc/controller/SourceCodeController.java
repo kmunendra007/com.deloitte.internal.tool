@@ -59,4 +59,13 @@ public class SourceCodeController {
 	public Map<String, Set<String>> retriveSourceMap() {
 		return null;
 	}
+	
+	@PostMapping("/getUndocumentedMethods")
+	public boolean getUndocumentedMethods(@RequestBody Map<String, Set<String>> sourceMap,
+			@RequestHeader String sessionId) {
+
+		codeService.checkUndocumentedMethods(sourceMap, sessionId);
+
+		return false;
+	}
 }

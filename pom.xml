@@ -54,14 +54,19 @@
 			<artifactId>lombok</artifactId>
 		</dependency>
 		<dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.6</version>
-        </dependency>
-         <dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<dependency>
 			<groupId>com.google.googlejavaformat</groupId>
 			<artifactId>google-java-format</artifactId>
 			<version>1.11.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.javassist</groupId> <!-- if a version prior to 3.13.0-GA is needed use "javassist" and not "org.javassist" -->
+			<artifactId>javassist</artifactId>
+			<version>3.15.0-GA</version>
 		</dependency>
 	</dependencies>
 
