@@ -4,6 +4,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,11 +32,20 @@ import com.code.removal.model.SourceCode;
 import com.thoughtworks.qdox.JavaDocBuilder;
 import com.thoughtworks.qdox.model.JavaSource;
 
+import javassist.ClassClassPath;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtMethod;
+import javassist.NotFoundException;
+
 public abstract class SourceCodeUtil {
 	private String filePath;
 
 	@Autowired
 	JavaDocBuilder builder;
+	
+	@Autowired
+	private ISessionDataManager sessionDataManager;
 
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
@@ -169,4 +182,62 @@ public abstract class SourceCodeUtil {
         return true;
     }
 	
+public List<String> checkUndocumentedMethods(Method[] methods,List<String> readAllLines,Class classObj) throws NotFoundException {
+		
+		List<String> missingDocMethods = new ArrayList<String>();
+		
+		for (Method method : methods) {
+			System.out.println("Method Name: "+method.getName());
+			
+			//Using javassist to get method line number
+			
+			ClassPool pool = ClassPool.getDefault();
+			ClassClassPath ccpath = new ClassClassPath(classObj);
+			pool.insertClassPath(ccpath);
+			CtClass ctClass = pool.get(method.getDeclaringClass().getCanonicalName());
+			CtMethod declaredMethod = ctClass.getDeclaredMethod(method.getName());
+			
+			int lineNumber = declaredMethod.getMethodInfo().getLineNumber(0);
+			int methodLineNumber = lineNumber-1; //InOrder to check the line before method name
+			System.out.println("Line Number of Method "+methodLineNumber);
+			
+			while (true) {
+				String line = readAllLines.get(methodLineNumber - 1); //Inorder to fetch from list 
+				if (line.equals("\t */")) { //check the last line of documentation before method
+					
+					break;
+				} else if (line.equals("\t}")) { // checking }
+					
+					missingDocMethods.add(method.getName());
+					break;
+				} else if(line.contains(";")){
+					
+					//Check for documentation on first method
+					missingDocMethods.add(method.getName());
+					break;
+				} else {
+					// decrement the lineNumber to check content
+					methodLineNumber--;
+				}
+			}
+		}
+		System.out.println("Method without documentation "+missingDocMethods.toString());
+		return missingDocMethods;
+	}
+	
+	
+	public Class getClassObj(String sessionId,String className,String packageName) throws ClassNotFoundException, MalformedURLException {
+		
+		File file = new File(sessionDataManager.getClassPath(sessionId));
+
+		// convert the file to URL format
+		URL url = file.toURI().toURL();
+		URL[] urls = new URL[] { url };
+
+		// load this folder into Class loader
+		ClassLoader cl = new URLClassLoader(urls);
+		
+		Class<?> classObj = cl.loadClass(packageName+"."+className.substring(0, className.indexOf(".java")));
+		return classObj;
+	}
 }

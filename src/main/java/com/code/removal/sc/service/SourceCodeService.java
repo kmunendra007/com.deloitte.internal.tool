@@ -1,7 +1,9 @@
 package com.code.removal.sc.service;
 
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -11,10 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.code.removal.model.SourceCode;
+import com.code.removal.sc.util.ISessionDataManager;
 import com.code.removal.sc.util.SourceCodeUtil;
 import com.google.googlejavaformat.java.Formatter;
-import com.code.removal.sc.util.ISessionDataManager;
-import com.code.removal.sc.util.SessionModel;
 
 @Service
 public class SourceCodeService extends SourceCodeUtil implements ISourceCodeService {
@@ -81,5 +82,44 @@ public class SourceCodeService extends SourceCodeUtil implements ISourceCodeServ
 		}
 		
 		return true;
+	}
+	
+	@Override
+	public List<String> checkUndocumentedMethods(Map<String, Set<String>> sourceMap, String sessionId) {
+		
+		List<String> missingDocMethods = new ArrayList<String>();
+		
+		try {
+			Set<Entry<String, Set<String>>> entrySet = sourceMap.entrySet();
+			
+			for (Entry<String, Set<String>> entry : entrySet) {
+
+				for (String className : entry.getValue()) {
+					
+					String sourcePath = sessionDataManager.getSourcePath(sessionId)+ entry.getKey().replace(".", "\\")+"\\"+className;
+									
+					Class classObj = getClassObj(sessionId,className,entry.getKey());
+														
+					Method[] methods = classObj.getDeclaredMethods();
+					
+					//Pass the source path to read the file
+					List<String> readAllLines = Files.readAllLines(Paths.get(sourcePath));
+					
+					List<String> undocumentedMethods = checkUndocumentedMethods(methods,readAllLines,classObj);
+					
+					if(!undocumentedMethods.isEmpty()) {
+						
+						missingDocMethods.addAll(undocumentedMethods);
+						
+					}
+					
+				}
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		return missingDocMethods;
 	}
 }

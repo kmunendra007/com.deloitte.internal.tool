@@ -14,4 +14,6 @@ public interface ISourceCodeService {
 	
 	boolean formatCode(final Map<String, Set<String>> sourceMap, final String sessionId);
 	
+	List<String> checkUndocumentedMethods(final Map<String, Set<String>> sourceMap, final String sessionId);
+	
 }
